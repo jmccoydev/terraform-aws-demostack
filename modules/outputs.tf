@@ -25,3 +25,7 @@ output "nomad_ui" {
 output "consul_ui" {
   value = "https://${aws_route53_record.consul.fqdn}:8500"
 }
+
+output "eks_endpoint" {
+  value = aws_eks_cluster.eks.endpoint
+}

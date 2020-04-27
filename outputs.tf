@@ -27,6 +27,9 @@ output "Primary_workers_Nodes" {
   value = [module.primarycluster.workers]
 }
 
+output "Primary_eks_endpoint" {
+  value = [module.primarycluster.eks_endpoint]
+}
 
 // Secondary
 /*
