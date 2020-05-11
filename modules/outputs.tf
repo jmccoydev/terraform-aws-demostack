@@ -45,10 +45,10 @@ output "nomad_tag_servers"{
   value = data.template_file.servers.*.vars.node_name
 }
 
-output "eks_endpoint" {
-  value = aws_eks_cluster.eks.endpoint
-}
-output "eks_ca" {
- // value = aws_eks_cluster.eks.endpoint
-  value = aws_eks_cluster.eks.certificate_authority.0.data
-}
+# output "eks_endpoint" {
+#   value = aws_eks_cluster.eks.endpoint
+# }
+# output "eks_ca" {
+#  // value = aws_eks_cluster.eks.endpoint
+#   value = aws_eks_cluster.eks.certificate_authority.0.data
+# }

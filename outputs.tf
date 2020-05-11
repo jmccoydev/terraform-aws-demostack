@@ -74,13 +74,13 @@ output "Primary_nomad_tag_servers"{
   value = module.primarycluster.nomad_tag_servers
 }
 
-output "Primary_k8s_eks_endpoint"{
-  value = module.primarycluster.eks_endpoint
-}
+# output "Primary_k8s_eks_endpoint"{
+#   value = module.primarycluster.eks_endpoint
+# }
 
-output "Primary_k8s_eks_ca"{
-  value = module.primarycluster.eks_ca
-}
+# output "Primary_k8s_eks_ca"{
+#   value = module.primarycluster.eks_ca
+# }
 
 
 // Secondary
