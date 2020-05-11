@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-set -e
-
 echo "==> Base"
 
 echo "==> libc6 issue workaround"
@@ -26,6 +24,7 @@ function ssh-apt {
     -o Dpkg::Options::="--force-confold" \
     "$@"
 }
+
 
 echo "--> Adding helper for IP retrieval"
 sudo tee /etc/profile.d/ips.sh > /dev/null <<EOF
@@ -56,9 +55,26 @@ sudo tee /etc/ssl/certs/me.key > /dev/null <<EOF
 ${me_key}
 EOF
 
+
+echo "--> Setting iptables for bridge networking"
+echo 1 > /proc/sys/net/bridge/bridge-nf-call-arptables
+echo 1 > /proc/sys/net/bridge/bridge-nf-call-ip6tables
+echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables
+
+echo "--> Making iptables settings for bridge networking config change"
+sudo tee /etc/sysctl.d/nomadtables > /dev/null <<EOF
+net.bridge.bridge-nf-call-arptables = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+
+echo "--> updated version of Nodejs"
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+
 echo "--> Installing common dependencies"
 ssh-apt install \
   build-essential \
+  nodejs \
   curl \
   emacs \
   git \
@@ -68,9 +84,16 @@ ssh-apt install \
   vim \
   wget \
   tree \
+  nfs-kernel-server \
+  nfs-common \
   python3-pip \
   ruby-full \
-  npm \
+  apt-transport-https \
+  ca-certificates \
+  curl \
+  gnupg-agent \
+  software-properties-common \
+  openjdk-9-jdk-headless \
   &>/dev/null
 
 echo "--> Installing git secrets"
@@ -104,5 +127,14 @@ echo "--> Configuring DNSmasq"
 sudo bash -c "cat >/etc/dnsmasq.d/10-consul" << EOF
 server=/consul/127.0.0.1#8600
 EOF
+
+echo "--> Install Envoy"
+curl -sL 'https://getenvoy.io/gpg' | sudo apt-key add -
+sudo add-apt-repository \
+"deb [arch=amd64] https://dl.bintray.com/tetrate/getenvoy-deb \
+$(lsb_release -cs) \
+stable"
+sudo apt-get update && sudo apt-get install -y getenvoy-envoy
+envoy --version
 
 echo "==> Base is done!"

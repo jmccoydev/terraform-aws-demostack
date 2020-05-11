@@ -1,6 +1,4 @@
-#!/usr/bin/env bash 
-set -ex
-
+#!/usr/bin/env bash
 echo "==> Vault (server)"
 # Vault expects the key to be concatenated with the CA
 sudo mkdir -p /etc/vault.d/tls/
@@ -29,6 +27,7 @@ sudo tee /etc/vault.d/config.hcl > /dev/null <<EOF
 cluster_name = "${namespace}-demostack"
 storage "consul" {
   path = "vault/"
+  service = "vault"
 }
 listener "tcp" {
   address       = "0.0.0.0:8200"
@@ -39,6 +38,10 @@ listener "tcp" {
 seal "awskms" {
   region = "${region}"
   kms_key_id = "${kmskey}"
+}
+telemetry {
+  prometheus_retention_time = "30s",
+  disable_hostname = true
 }
 api_addr = "https://$(public_ip):8200"
 disable_mlock = true
@@ -82,7 +85,7 @@ if ! vault operator init -status >/dev/null; then
   vault operator init  -recovery-shares=1 -recovery-threshold=1 -key-shares=1 -key-threshold=1 > /tmp/out.txt
   cat /tmp/out.txt | grep "Recovery Key 1" | sed 's/Recovery Key 1: //' | consul kv put service/vault/recovery-key -
    cat /tmp/out.txt | grep "Initial Root Token" | sed 's/Initial Root Token: //' | consul kv put service/vault/root-token -
-  
+
 export VAULT_TOKEN=$(consul kv get service/vault/root-token)
 echo "ROOT TOKEN: $VAULT_TOKEN"
 
@@ -161,36 +164,36 @@ echo "--> Attempting to create nomad role"
 }
 
 path "pki/*" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 EOR
 
   vault policy write test - <<EOR
   path "kv/*" {
-    capabilities = ["list"] 
+    capabilities = ["list"]
 }
 
 path "kv/test" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 path "kv/data/test" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 path "pki/*" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 
 path "kv/metadata/cgtest" {
-    capabilities = ["list"] 
+    capabilities = ["list"]
 }
 
 
 path "kv/data/cgtest" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
     control_group = {
         factor "approvers" {
             identity {
@@ -212,7 +215,7 @@ EOR
     orphan=false \
     disallowed_policies=nomad-server \
     explicit_max_ttl=0
- 
+
  echo "--> Mount KV in Vault"
  {
  vault secrets enable -version=2 kv &&
@@ -241,7 +244,7 @@ vault write pki/root/generate/internal common_name=service.consul
   echo "--> pki generate internal already configured, moving on"
 }
 {
-vault write pki/roles/consul-service generate_lease=true allowed_domains="service.consul" allow_subdomains="true" 
+vault write pki/roles/consul-service generate_lease=true allowed_domains="service.consul" allow_subdomains="true"
 }||
 {
   echo "--> pki role already configured, moving on"
@@ -249,20 +252,20 @@ vault write pki/roles/consul-service generate_lease=true allowed_domains="servic
 
 {
 vault policy write superuser - <<EOR
-path "*" { 
-  capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+path "*" {
+  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
   }
 
   path "kv/*" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 path "kv/test/*" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 path "pki/*" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 path "sys/control-group/authorize" {
@@ -312,5 +315,28 @@ echo "--> Setting up Github auth"
  {
    echo "-->consul query already done, moving on"
  }
+
+
+ echo "-->Enabling transform"
+vault secrets enable  -path=/data-protection/masking/transform transform
+
+echo "-->Configuring CCN role for transform"
+vault write /data-protection/masking/transform/role/ccn transformations=ccn
+
+
+echo "-->Configuring transformation template"
+vault write /data-protection/masking/transform/transformation/ccn \
+        type=masking \
+        template="card-mask" \
+        masking_character="#" \
+        allowed_roles=ccn
+        
+echo "-->Configuring template masking"
+vault write /data-protection/masking/transform/template/card-mask type=regex \
+        pattern="(\d{4})-(\d{4})-(\d{4})-\d{4}" \
+        alphabet="builtin/numeric"
+        
+echo "-->Test transform"
+vault write /data-protection/masking/transform/encode/ccn value=2345-2211-3333-4356
 
 echo "==> Vault is done!"

@@ -1,4 +1,4 @@
-data "template_file" "server" {
+data "template_file" "servers" {
   count = "${var.servers}"
 
   template = "${join("\n", list(
@@ -9,7 +9,6 @@ data "template_file" "server" {
     file("${path.module}/templates/server/vault.sh"),
     file("${path.module}/templates/server/nomad.sh"),
     file("${path.module}/templates/server/nomad-jobs.sh"),
-    
   ))}"
 
   vars = {
@@ -29,6 +28,7 @@ data "template_file" "server" {
     public_key = var.public_key
 
     # Consul
+    primary_datacenter    = var.primary_datacenter
     consul_url            = var.consul_url
     consul_ent_url        = var.consul_ent_url
     consul_gossip_key     = var.consul_gossip_key
@@ -45,8 +45,7 @@ data "template_file" "server" {
 
     # Nomad jobs
     fabio_url      = var.fabio_url
-    hashiui_url    = var.hashiui_url
-
+    
     # Vault
     vault_url        = var.vault_url
     vault_ent_url    = var.vault_ent_url
@@ -56,7 +55,7 @@ data "template_file" "server" {
 }
 
 # Gzip cloud-init config
-data "template_cloudinit_config" "server" {
+data "template_cloudinit_config" "servers" {
   count = "${var.servers}"
 
   gzip          = true
@@ -64,12 +63,12 @@ data "template_cloudinit_config" "server" {
 
   part {
     content_type = "text/x-shellscript"
-    content      = "${element(data.template_file.server.*.rendered, count.index)}"
+    content      = "${element(data.template_file.servers.*.rendered, count.index)}"
   }
 }
 
 
-resource "aws_instance" "server" {
+resource "aws_instance" "servers" {
   count = var.servers
 
   ami           = data.aws_ami.ubuntu.id
@@ -80,14 +79,14 @@ resource "aws_instance" "server" {
   iam_instance_profile   = aws_iam_instance_profile.consul-join.name
   vpc_security_group_ids = [aws_security_group.demostack.id]
   root_block_device{
-    volume_size           = "50"
+    volume_size           = "240"
     delete_on_termination = "true"
   }
 
    ebs_block_device  {
     device_name           = "/dev/xvdd"
     volume_type           = "gp2"
-    volume_size           = "50"
+    volume_size           = "240"
     delete_on_termination = "true"
 }
 
@@ -100,5 +99,5 @@ resource "aws_instance" "server" {
     ConsulJoin     = var.consul_join_tag_value
   }
 
-  user_data = "${element(data.template_cloudinit_config.server.*.rendered, count.index)}"
+  user_data = "${element(data.template_cloudinit_config.servers.*.rendered, count.index)}"
 }

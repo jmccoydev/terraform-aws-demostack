@@ -1,10 +1,11 @@
 
-resource "aws_route53_record" "hashiui" {
+
+resource "aws_route53_record" "traefik" {
   zone_id = var.zone_id
-   name    = "hashiui.${var.namespace}"
-  # name    = "hashiui"
+   name    = "traefik.${var.namespace}"
+  #name    = "traefik"
   type    = "CNAME"
-  records = [aws_instance.workers.0.public_dns]
+  records = [aws_alb.traefik.dns_name]
   ttl     = "300"
 }
 resource "aws_route53_record" "fabio" {
@@ -46,7 +47,7 @@ resource "aws_route53_record" "servers" {
   name    = "server-${count.index}.${var.namespace}"
   // name    = "server-${count.index}"
   type    = "CNAME"
-  records = ["${element(aws_instance.server.*.public_dns, count.index)}"]
+  records = ["${element(aws_instance.servers.*.public_dns, count.index)}"]
   ttl     = "300"
 }
 
