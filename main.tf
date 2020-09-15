@@ -12,7 +12,7 @@ terraform {
 }
 
 // Workspace Data
-data "terraform_remote_state" "emea_se_playground_tls_root_certificate" {
+data "terraform_remote_state" "devworks_tls_root_certificate" {
   backend =  "remote"
   config = {
     hostname     = "app.terraform.io"
@@ -60,15 +60,14 @@ module "primarycluster" {
   run_nomad_jobs       = var.run_nomad_jobs
   host_access_ip       = local.host_access_ip
   primary_datacenter   = var.primary_datacenter
-
-  # EMEA-SE-PLAYGROUND
-  ca_key_algorithm      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_key_algorithm
-  ca_private_key_pem    = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_private_key_pem
-  ca_cert_pem           = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_cert_pem
-  consul_join_tag_value = "${var.namespace}-${data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_join_tag_value}"
-  consul_gossip_key     = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_gossip_key
-  consul_master_token   = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_master_token
-  nomad_gossip_key      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.nomad_gossip_key
+  # devworks-tls
+  ca_key_algorithm      = data.terraform_remote_state.devworks_tls_root_certificate.outputs.ca_key_algorithm
+  ca_private_key_pem    = data.terraform_remote_state.devworks_tls_root_certificate.outputs.ca_private_key_pem
+  ca_cert_pem           = data.terraform_remote_state.devworks_tls_root_certificate.outputs.ca_cert_pem
+  consul_join_tag_value = "${var.namespace}-${data.terraform_remote_state.devworks_tls_root_certificate.outputs.consul_join_tag_value}"
+  consul_gossip_key     = data.terraform_remote_state.devworks_tls_root_certificate.outputs.consul_gossip_key
+  consul_master_token   = data.terraform_remote_state.devworks_tls_root_certificate.outputs.consul_master_token
+  nomad_gossip_key      = data.terraform_remote_state.devworks_tls_root_certificate.outputs.nomad_gossip_key
 }
 
 /*
@@ -102,14 +101,14 @@ module "secondarycluster" {
   run_nomad_jobs       = var.run_nomad_jobs
   host_access_ip       = local.host_access_ip
   primary_datacenter   = var.primary_datacenter
-  # EMEA-SE-PLAYGROUND
-  ca_key_algorithm      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_key_algorithm
-  ca_private_key_pem    = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_private_key_pem
-  ca_cert_pem           = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_cert_pem
-  consul_join_tag_value = "${var.namespace}-${data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_join_tag_value}"
-  consul_gossip_key     = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_gossip_key
-  consul_master_token   = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_master_token
-  nomad_gossip_key      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.nomad_gossip_key
+  # devworks-tls
+  ca_key_algorithm      = data.terraform_remote_state.devworks_tls_root_certificate.outputs.ca_key_algorithm
+  ca_private_key_pem    = data.terraform_remote_state.devworks_tls_root_certificate.outputs.ca_private_key_pem
+  ca_cert_pem           = data.terraform_remote_state.devworks_tls_root_certificate.outputs.ca_cert_pem
+  consul_join_tag_value = "${var.namespace}-${data.terraform_remote_state.devworks_tls_root_certificate.outputs.consul_join_tag_value}"
+  consul_gossip_key     = data.terraform_remote_state.devworks_tls_root_certificate.outputs.consul_gossip_key
+  consul_master_token   = data.terraform_remote_state.devworks_tls_root_certificate.outputs.consul_master_token
+  nomad_gossip_key      = data.terraform_remote_state.devworks_tls_root_certificate.outputs.nomad_gossip_key
 }
 */
 
@@ -144,14 +143,14 @@ module "tertiarycluster" {
   run_nomad_jobs       = var.run_nomad_jobs
   host_access_ip       = var.host_access_ip
   primary_datacenter   = var.primary_datacenter
-  # EMEA-SE-PLAYGROUND
-  ca_key_algorithm      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_key_algorithm
-  ca_private_key_pem    = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_private_key_pem
-  ca_cert_pem           = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_cert_pem
-  consul_join_tag_value = "${var.namespace}-${data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_join_tag_value}"
-  consul_gossip_key     = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_gossip_key
-  consul_master_token   = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_master_token
-  nomad_gossip_key      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.nomad_gossip_key
+  # devworks-tls
+  ca_key_algorithm      = data.terraform_remote_state.devworks_tls_root_certificate.outputs.ca_key_algorithm
+  ca_private_key_pem    = data.terraform_remote_state.devworks_tls_root_certificate.outputs.ca_private_key_pem
+  ca_cert_pem           = data.terraform_remote_state.devworks_tls_root_certificate.outputs.ca_cert_pem
+  consul_join_tag_value = "${var.namespace}-${data.terraform_remote_state.devworks_tls_root_certificate.outputs.consul_join_tag_value}"
+  consul_gossip_key     = data.terraform_remote_state.devworks_tls_root_certificate.outputs.consul_gossip_key
+  consul_master_token   = data.terraform_remote_state.devworks_tls_root_certificate.outputs.consul_master_token
+  nomad_gossip_key      = data.terraform_remote_state.devworks_tls_root_certificate.outputs.nomad_gossip_key
 }
 */
 
