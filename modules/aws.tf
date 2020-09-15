@@ -62,7 +62,7 @@ resource "aws_route" "internet_access" {
 data "aws_availability_zones" "available" {}
 
 resource "aws_subnet" "demostack" {
-  count                   = "${length(var.cidr_blocks)}"
+  count                   = "length(var.cidr_blocks)"
   vpc_id                  = aws_vpc.demostack.id
   availability_zone       = "${data.aws_availability_zones.available.names[count.index]}"
   cidr_block              = "${var.cidr_blocks[count.index]}"
