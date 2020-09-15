@@ -3,10 +3,10 @@
 terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
-    organization = "emea-se-playground-2019"
+    organization = "devworks"
 
     workspaces {
-      name = "Andre-AWS-Demostack"
+      name = "jmccoy-aws-emostack"
     }
   }
 }
@@ -16,7 +16,7 @@ data "terraform_remote_state" "emea_se_playground_tls_root_certificate" {
   backend =  "remote"
   config = {
     hostname     = "app.terraform.io"
-    organization = "emea-se-playground-2019"
+    organization = "devworks"
     workspaces  = {
       name = "tls-root-certificate"
     }
