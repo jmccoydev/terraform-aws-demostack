@@ -7,9 +7,9 @@ provider "aws" {
   region  = var.region
 }
 //Getting the Domaing name
-#data "aws_route53_zone" "fdqn" {
-#  zone_id = var.zone_id
-#}
+# data "aws_route53_zone" "fdqn" {
+#   zone_id = var.zone_id
+# }
 
 
 data "aws_ami" "ubuntu" {
