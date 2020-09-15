@@ -1,4 +1,4 @@
-//--------------------------EMEA-SE_PLAYGROUND-2019-----------------------------------------
+//-------------------------------------------------------------------
 # Using a single workspace:
 terraform {
   backend "remote" {
@@ -11,17 +11,7 @@ terraform {
   }
 }
 
-// Workspace Data
-data "terraform_remote_state" "emea_se_playground_tls_root_certificate" {
-  backend =  "remote"
-  config = {
-    hostname     = "app.terraform.io"
-    organization = "devworks"
-    workspaces  = {
-      name = "tls-root-certificate"
-    }
-  }
-}
+
 
 //--------------------------------------------------------------------
 
