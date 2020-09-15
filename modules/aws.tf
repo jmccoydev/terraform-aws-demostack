@@ -6,7 +6,7 @@ provider "aws" {
   version = "~> 2.0"
   region  = var.region
 }
-//Getting the Domaing name
+//Getting the Domain name
 data "aws_route53_zone" "fdqn" {
   zone_id = var.zone_id
 }
