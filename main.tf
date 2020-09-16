@@ -6,7 +6,7 @@ terraform {
     organization = "devworks"
 
     workspaces {
-      name = "jmccoy-aws-demostack"
+      name = "terraform-aws-demostack"
     }
   }
 }
