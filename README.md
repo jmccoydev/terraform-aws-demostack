@@ -3,7 +3,6 @@
 ## Solution Diagram
 ![Solution Diagram](./assets/Demostack_overview.webp)
 
-
 ## Dependencies
  <TODO>
 
